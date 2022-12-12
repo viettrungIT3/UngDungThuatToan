@@ -1,0 +1,341 @@
+Bai 1: 
+
+#include<iostream>
+
+using namespace std;
+
+struct DienThoai{
+	char nh[100];
+	int	 kt;
+	double gia;
+};
+
+DienThoai dt[5] = {
+	{"Nokia", 10, 900},
+	{"Samsung", 12, 5000},
+	{"Oppo", 15, 8000},
+	{"Huawai", 17, 3000},
+	{"Apple", 16, 10000}
+};
+
+void algorithm(double* F[6], int s) {
+	for (int j = 0; j <= s; j++) {
+		F[0][j] = 0;
+	}
+
+	for (int i = 1; i <= 5; i++) {
+		for (int j = 0; j <= s; j++) {
+			F[i][j] = F[i - 1][j];
+			double tmp = F[i - 1][j - dt[i-1].kt] + dt[i - 1].gia;
+			if (j >= dt[i - 1].kt && tmp > F[i][j])
+				F[i][j] = tmp;
+		}
+	}
+}
+
+void result(double* F[6], int s) {
+	cout << "Nhung chiec dien thoai da lay: " << endl;
+	int i = 5, j = s;
+	int count = 0;
+	while (i > 0)
+	{
+		if (F[i][j] != F[i - 1][j]) {
+			cout << dt[i - 1].nh << " " << dt[i - 1].gia << endl;
+			j = j - dt[i - 1].kt;
+			count++;
+		}
+		i--;
+	}
+	cout << "So chiec dien thoai co the lay duoc la: " << count<<endl;
+}
+
+double dem_dt(int l, int r) {
+	if (l < r) {
+		int m = (l + r) / 2;
+		int demL = dem_dt(l, m);
+		int demR = dem_dt(m + 1, r);
+		return (demL + demR);
+	}
+	else {
+		if (dt[l].gia >= 3000 && dt[l].gia <= 6000) {
+			cout << dt[l].nh << " " << dt[l].kt << " " << dt[l].gia << endl;
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
+
+int main() {
+	int s;
+	cout << "Nhap kich thuoc chiec tui: ";
+	cin >> s;
+	cout << "===================" << endl;
+
+	double** F = new double*[5 + 1];
+	for (int i = 0; i <= 5; i++) {
+		F[i] = new double[s + 1];
+	}
+
+	algorithm(F, s);
+	result(F, s);
+	cout << "===================" << endl;
+
+	cout << "So dien thoai gia tu 3000 den 6000 la: " << dem_dt(0, 5);
+	return 0;
+}
+
+
+=========================================================
+
+Bai 2
+
+#include<iostream>
+#include<string.h>
+
+using namespace std;
+
+struct ds
+{
+	char s[100];
+};
+
+ds d[6] = {
+	"hello",
+	"world",
+	"my child",
+	"name is",
+	"is",
+	"Giang child child"
+};
+
+int xau_nho_nhat(int l, int r) {
+
+	if (l < r) {
+		int mid = (l + r) / 2;
+		int minL = xau_nho_nhat(l, mid);
+		int minR = xau_nho_nhat(mid + 1, r);
+		return (minL < minR) ? minL : minR;
+	}
+	else {
+		return strlen(d[l].s);
+	}
+}
+
+int tong_chieu_dai(int l, int r) {
+	if (l < r) {
+		int mid = (l + r) / 2;
+		int sumL = tong_chieu_dai(l, mid);
+		int sumR = tong_chieu_dai(mid + 1, r);
+		return sumL + sumR;
+	}
+	else {
+		return strlen(d[l].s);
+	}
+}
+
+void merge(int l, int r, int m) {
+	int n1 = m - l + 1;
+	int n2 = r - m;
+
+	ds* a = new ds[n1];
+	ds* b = new ds[n2];
+
+	for (int i = 0; i < n1; i++) {
+		a[i] = d[l + i];
+	}
+	for (int j = 0; j < n2; j++) {
+		b[j] = d[m + j + 1];
+	}
+
+	int i = 0, j = 0;
+	int k = l;
+	while (i < n1 && j < n2) { //noi 2 mang a, b -> d
+		if (strlen(a[i].s) < strlen(b[j].s)) {
+			d[k] = a[i];
+			i++;
+		}
+		else {
+			d[k] = b[j];
+			j++;
+		}
+		k++;
+	}
+    // sau khi het 1 mang nao do thì lam tiep
+	while (i < n1) {
+		d[k] = a[i];
+		i++;
+		k++;
+	}
+
+	while (j < n2) {
+		d[k] = b[j];
+		j++;
+		k++;
+	}
+}
+
+void mergeSort(int l, int r) {
+	if (l < r) {
+		int m = (l + r) / 2;
+		mergeSort(l, m);
+		mergeSort(m + 1, r);
+		merge(l, r, m);
+	}
+}
+
+void show() {
+	for (int i = 0; i < 6; i++) {
+			cout << d[i].s << " ";
+	}
+	cout << endl;
+}
+
+int search(int l, int r, char* st) {
+	if (l <= r) {
+		int m = (l + r) / 2;
+		if (strcmp(d[m].s, st) == 0) {
+			return m;
+		}
+		if (strlen(st) < strlen(d[m].s)) {
+			return search(l, m, st);
+		}
+		else {
+			return search(m + 1, r, st);
+		}
+	}
+	return -1;
+}
+
+int char_in_string(char k, char p[]) {
+	int len = strlen(p);
+	for (int i = len - 1; i >= 0; i--) {
+		if (p[i] == k)
+			return i;
+	}
+	return -1;
+}
+
+int Boyer_Moore_Horspool(char t[], char p[]) {
+	int dem = 0;
+	int i = strlen(p), v = i = strlen(p);
+	int len = strlen(t);
+	while (i < len) {
+		int x = v - 1;
+		int j = i - 1;
+
+		while (t[j] == p[x] && x > -1) {
+			x--;
+			j--;
+		}
+
+		if (x < 0) {
+			dem++;
+			i = i + v;
+		}
+		else {
+			x = char_in_string(t[j], p);
+			if (x < 0)
+				i = i + v;
+			else
+				i = i + v - x - 1;
+		}
+	}
+	return dem;
+}
+
+void z_algo(char s[], int *z) {
+	int n = strlen(s);
+	int l = 0, r = 0;
+	for (int i = 1; i < n; i++) {
+		if (i > r) {
+			l = r = i;
+			while (r < n && s[r - l] == s[r])
+				r++;
+			z[i] = r - l;
+			r--;
+		}
+		else if (z[i - l] < r - i + 1) {
+			z[i] = z[i - l];
+		}
+		else {
+			l = i;
+			while (r < n && s[r - l] == s[r])
+				r++;
+			z[i] = r - l;
+			r--;
+		}
+	}
+}
+
+int main() {
+	cout << "Xau co chieu dai nho nhat trong day d la: " << endl;
+	for (int i = 0; i < 6; i++) {
+		if (strlen(d[i].s) == xau_nho_nhat(0, 5))
+			cout << d[i].s << endl;
+	}
+	cout << endl;
+
+	cout << "Tong chieu dai cua cac xau trong ds d: " << tong_chieu_dai(0, 5)<<endl;
+
+	cout << "Danh sach sau khi sap xep la: " << endl;
+	mergeSort(0, 5);
+	show();
+
+	char st[] = "hello";
+	int vt = search(0, 5, st);
+	if (vt == -1) {
+		cout << st << " khong ton tai trong day" << endl;
+	}
+	else {
+		cout << st << " ton tai trong day. Vi tri: " << vt + 1<< endl << endl;
+	}
+
+	char p[] = "child";
+	cout << Boyer_Moore_Horspool(d[5].s, p);
+	int dem = 0;
+
+	cout << "Xau con co tu child: " << endl;
+	for (int i = 0; i < 6; i++) {
+		dem += Boyer_Moore_Horspool(d[i].s, p);
+
+		if (Boyer_Moore_Horspool(d[i].s, p) > 0) {
+			cout << d[i].s << endl;
+		}
+	}
+	cout << "Tu child xuat hien trong " << dem << " xau cua d" << endl<<endl;
+
+	for (int i = 1; i < 6; i++) {
+		dem = 0;
+		char tg[200];
+		int k = 0;
+		for (int j = 0; j < strlen(d[0].s); j++) {
+			tg[k] = d[0].s[j];
+			k++;
+		}
+		tg[k++] = '$';
+		for (int j = 0; j < strlen(d[i].s); j++) {
+			tg[k] = d[i].s[j];
+			k++;
+		}
+
+		tg[k] = '\0';
+		int len = strlen(tg);
+
+		int* z = new int[len];
+		z_algo(tg, z);
+
+		for (int i = 1; i < len; i++) {
+			if (z[i] == strlen(d[0].s)) {
+				dem++;
+			}
+		}
+
+		if (dem > 0)
+			cout << d[i].s <<". So lan xuat hien: "<< dem << endl;
+	}
+
+	return 0;
+}
